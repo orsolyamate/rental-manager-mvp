@@ -31,6 +31,8 @@ use the editor.
 
 ## Project rules
 
-- Public data is read in `createServerFn` handlers with a per-request publishable-key client (see `src/lib/fixed-data.functions.ts`), so RLS applies and no auth is needed.
+- All database reads and writes go through `createServerFn` handlers using `createPublicDbClient()` (`src/lib/public-db.ts`), so RLS applies and no auth is needed; writes validate with the shared zod schema server-side too.
+- The effective-fee rule lives only in `getEffectiveEntry` (`src/lib/fees.ts`); every screen that needs a month's rent or common cost must call it, never re-implement it.
+- Fee history is append-only: no UPDATE/DELETE grants, one value per apartment per valid_from date.
 - Every new public table must REVOKE the platform's default anon/authenticated privileges and GRANT back only what its policies need; defaults otherwise allow writes.
 - Main navigation items live in `src/lib/nav.ts`; header and route tests read from it so menu and routes stay in sync.

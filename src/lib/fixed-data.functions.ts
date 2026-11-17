@@ -1,29 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
-import { createClient } from "@supabase/supabase-js";
-import type { Database } from "@/integrations/supabase/types";
+import { createPublicDbClient } from "./public-db";
 
 export type FixedData = {
   apartment: { id: string; name: string; address: string };
   tenant: { id: string; name: string } | null;
 };
 
-// Read-only: the fixed apartment and its current tenant, read with the publishable (anon) key so RLS applies.
+// Read-only: the fixed apartment and its current tenant (RLS applies via the anon key).
 export const getFixedData = createServerFn({ method: "GET" }).handler(
   async (): Promise<FixedData> => {
-    const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
-    const supabase = createClient<Database>(process.env["SUPABASE_URL"]!, key, {
-      auth: { persistSession: false, autoRefreshToken: false, storage: undefined },
-      global: {
-        fetch: (input, init) => {
-          const h = new Headers(init?.headers);
-          if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) {
-            h.delete("Authorization");
-          }
-          h.set("apikey", key);
-          return fetch(input, { ...init, headers: h });
-        },
-      },
-    });
+    const supabase = createPublicDbClient();
 
     const { data: apartment, error: apartmentError } = await supabase
       .from("apartments")

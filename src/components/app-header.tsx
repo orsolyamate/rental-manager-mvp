@@ -39,7 +39,12 @@ export function AppHeader() {
 
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="md:hidden" aria-label="Menü megnyitása">
+            <Button
+              variant="outline"
+              size="icon"
+              className="md:hidden"
+              aria-label="Menü megnyitása"
+            >
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>

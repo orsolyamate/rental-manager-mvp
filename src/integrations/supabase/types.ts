@@ -35,6 +35,70 @@ export type Database = {
         }
         Relationships: []
       }
+      common_cost_history: {
+        Row: {
+          amount: number
+          apartment_id: string
+          created_at: string
+          id: string
+          valid_from: string
+        }
+        Insert: {
+          amount: number
+          apartment_id: string
+          created_at?: string
+          id?: string
+          valid_from: string
+        }
+        Update: {
+          amount?: number
+          apartment_id?: string
+          created_at?: string
+          id?: string
+          valid_from?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "common_cost_history_apartment_id_fkey"
+            columns: ["apartment_id"]
+            isOneToOne: false
+            referencedRelation: "apartments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rent_history: {
+        Row: {
+          amount: number
+          apartment_id: string
+          created_at: string
+          id: string
+          valid_from: string
+        }
+        Insert: {
+          amount: number
+          apartment_id: string
+          created_at?: string
+          id?: string
+          valid_from: string
+        }
+        Update: {
+          amount?: number
+          apartment_id?: string
+          created_at?: string
+          id?: string
+          valid_from?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rent_history_apartment_id_fkey"
+            columns: ["apartment_id"]
+            isOneToOne: false
+            referencedRelation: "apartments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenants: {
         Row: {
           apartment_id: string
