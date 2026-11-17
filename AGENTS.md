@@ -28,3 +28,9 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+
+- Public data is read in `createServerFn` handlers with a per-request publishable-key client (see `src/lib/fixed-data.functions.ts`), so RLS applies and no auth is needed.
+- Every new public table must REVOKE the platform's default anon/authenticated privileges and GRANT back only what its policies need; defaults otherwise allow writes.
+- Main navigation items live in `src/lib/nav.ts`; header and route tests read from it so menu and routes stay in sync.

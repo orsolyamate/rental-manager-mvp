@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HaviElszamolasRouteImport } from './routes/havi-elszamolas'
+import { Route as SzamlakRouteImport } from './routes/szamlak'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HaviElszamolasRoute = HaviElszamolasRouteImport.update({
+  id: '/havi-elszamolas',
+  path: '/havi-elszamolas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SzamlakRoute = SzamlakRouteImport.update({
+  id: '/szamlak',
+  path: '/szamlak',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/havi-elszamolas': typeof HaviElszamolasRoute
+  '/szamlak': typeof SzamlakRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/havi-elszamolas': typeof HaviElszamolasRoute
+  '/szamlak': typeof SzamlakRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/havi-elszamolas': typeof HaviElszamolasRoute
+  '/szamlak': typeof SzamlakRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/havi-elszamolas' | '/szamlak'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/havi-elszamolas' | '/szamlak'
+  id: '__root__' | '/' | '/havi-elszamolas' | '/szamlak'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HaviElszamolasRoute: typeof HaviElszamolasRoute
+  SzamlakRoute: typeof SzamlakRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/havi-elszamolas': {
+      id: '/havi-elszamolas'
+      path: '/havi-elszamolas'
+      fullPath: '/havi-elszamolas'
+      preLoaderRoute: typeof HaviElszamolasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/szamlak': {
+      id: '/szamlak'
+      path: '/szamlak'
+      fullPath: '/szamlak'
+      preLoaderRoute: typeof SzamlakRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HaviElszamolasRoute: HaviElszamolasRoute,
+  SzamlakRoute: SzamlakRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
