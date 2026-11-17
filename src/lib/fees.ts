@@ -1,4 +1,7 @@
 import { z } from "zod";
+import { amountSchema, requiredDateSchema } from "./common";
+
+export { formatDate, formatHuf, parseAmountInput } from "./common";
 
 export type FeeKind = "rent" | "common_cost";
 
@@ -43,51 +46,10 @@ export function getUpcomingEntries(entries: FeeEntry[], monthFirstDay: string): 
     .sort((a, b) => a.valid_from.localeCompare(b.valid_from));
 }
 
-const hufFormatter = new Intl.NumberFormat("hu-HU", {
-  style: "currency",
-  currency: "HUF",
-  maximumFractionDigits: 2,
-  minimumFractionDigits: 0,
-});
-
-export function formatHuf(amount: number): string {
-  return hufFormatter.format(amount);
-}
-
-/** "2026-07-01" -> "2026.07.01." */
-export function formatDate(isoDate: string): string {
-  const [y, m, d] = isoDate.split("-");
-  return `${y}.${m}.${d}.`;
-}
-
-/** Parses user input like "220 000" or "1500,5" into a number (NaN if not a number). */
-export function parseAmountInput(raw: string): number {
-  const cleaned = raw.replace(/[\s\u00a0]/g, "").replace(",", ".");
-  if (cleaned === "" || !/^-?\d+(\.\d+)?$/.test(cleaned)) return Number.NaN;
-  return Number(cleaned);
-}
-
-function isRealDate(value: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-  const d = new Date(`${value}T00:00:00Z`);
-  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === value;
-}
-
 export const newFeeSchema = z.object({
   kind: z.enum(["rent", "common_cost"]),
-  amount: z
-    .number({
-      invalid_type_error: "Az összeg csak szám lehet.",
-      required_error: "Add meg az összeget.",
-    })
-    .refine((n) => Number.isFinite(n), "Az összeg csak szám lehet.")
-    .refine((n) => n > 0, "Az összegnek nullánál nagyobbnak kell lennie.")
-    .refine((n) => n < 10_000_000_000, "Az összeg túl nagy.")
-    .refine((n) => Math.round(n * 100) === n * 100, "Legfeljebb két tizedesjegy adható meg."),
-  validFrom: z
-    .string({ required_error: "Add meg a hatálybalépés dátumát." })
-    .min(1, "Add meg a hatálybalépés dátumát.")
-    .refine(isRealDate, "Érvénytelen dátum."),
+  amount: amountSchema,
+  validFrom: requiredDateSchema("Add meg a hatálybalépés dátumát."),
 });
 
 export type NewFeeInput = z.infer<typeof newFeeSchema>;

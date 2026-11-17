@@ -22,6 +22,13 @@
       "when": 1794936820142,
       "tag": "0002_rent_and_common_cost_history",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794941598948,
+      "tag": "0003_invoices",
+      "breakpoints": true
     }
   ]
 }

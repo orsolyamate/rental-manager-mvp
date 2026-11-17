@@ -67,6 +67,50 @@ export type Database = {
           },
         ]
       }
+      invoices: {
+        Row: {
+          amount: number
+          apartment_id: string
+          created_at: string
+          due_date: string | null
+          id: string
+          invoice_date: string
+          paid: boolean
+          paid_date: string | null
+          provider_name: string | null
+        }
+        Insert: {
+          amount: number
+          apartment_id: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          invoice_date: string
+          paid?: boolean
+          paid_date?: string | null
+          provider_name?: string | null
+        }
+        Update: {
+          amount?: number
+          apartment_id?: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          invoice_date?: string
+          paid?: boolean
+          paid_date?: string | null
+          provider_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_apartment_id_fkey"
+            columns: ["apartment_id"]
+            isOneToOne: false
+            referencedRelation: "apartments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rent_history: {
         Row: {
           amount: number

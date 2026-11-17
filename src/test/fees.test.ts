@@ -80,5 +80,8 @@ describe("formatting", () => {
   it("formats dates and forints the Hungarian way", () => {
     expect(formatDate("2026-07-01")).toBe("2026.07.01.");
     expect(formatHuf(220000).replace(/\s/g, " ")).toBe("220 000 Ft");
+    expect(formatHuf(8540).replace(/\s/g, " ")).toBe("8 540 Ft");
+    expect(formatHuf(1500.5).replace(/\s/g, " ")).toBe("1 500,5 Ft");
+    expect(formatHuf(999).replace(/\s/g, " ")).toBe("999 Ft");
   });
 });
