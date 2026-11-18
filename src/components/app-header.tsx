@@ -30,7 +30,7 @@ export function AppHeader() {
               to={item.to}
               className={linkBase}
               activeProps={{ className: linkActive, "aria-current": "page" }}
-              activeOptions={{ exact: true }}
+              activeOptions={{ exact: true, includeSearch: false }}
             >
               {item.label}
             </Link>
@@ -60,7 +60,7 @@ export function AppHeader() {
                   onClick={() => setOpen(false)}
                   className={`${linkBase} py-3 text-base`}
                   activeProps={{ className: linkActive, "aria-current": "page" }}
-                  activeOptions={{ exact: true }}
+                  activeOptions={{ exact: true, includeSearch: false }}
                 >
                   {item.label}
                 </Link>

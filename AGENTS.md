@@ -39,3 +39,4 @@ use the editor.
 - Fee history is append-only: no UPDATE/DELETE grants, one value per apartment per valid_from date.
 - Every new public table must REVOKE the platform's default anon/authenticated privileges and GRANT back only what its policies need; defaults otherwise allow writes.
 - Main navigation items live in `src/lib/nav.ts`; header and route tests read from it so menu and routes stay in sync.
+- Monthly settlement is computed on the fly by `computeSettlement` (`src/lib/settlement.ts`) from fee history and invoices; never store settlements in a table. A missing rent or common cost yields `total: null`, never a 0-based total. The selected month lives in the `?honap=YYYY-MM` search param.
