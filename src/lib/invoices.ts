@@ -17,6 +17,8 @@ const optionalDate = z
   .default("")
   .refine((v) => v === "" || isRealDate(v), "Érvénytelen dátum.");
 
+const PAID_DATE_REQUIRED = "Fizetett számlánál add meg a fizetés dátumát.";
+
 /**
  * New invoice rules:
  * - provider name optional (empty -> null), max 200 chars
@@ -43,7 +45,7 @@ export const newInvoiceSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["paidDate"],
-        message: "Fizetett számlánál add meg a fizetés dátumát.",
+        message: PAID_DATE_REQUIRED,
       });
     }
   })
@@ -68,3 +70,27 @@ export const INVOICE_FIELDS = [
   "paidDate",
 ] as const;
 export type InvoiceField = (typeof INVOICE_FIELDS)[number];
+
+/**
+ * Payment status change on an existing invoice (only paid / paid_date may change):
+ * - paid = true  -> paid date required
+ * - paid = false -> paid date stored as null
+ */
+export const invoicePaymentSchema = z
+  .object({
+    id: z.string().uuid("Érvénytelen számla."),
+    paid: z.boolean({ required_error: "Add meg, hogy fizetve van-e." }),
+    paidDate: optionalDate,
+  })
+  .superRefine((v, ctx) => {
+    if (v.paid && v.paidDate === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["paidDate"],
+        message: PAID_DATE_REQUIRED,
+      });
+    }
+  })
+  .transform((v) => ({ id: v.id, paid: v.paid, paidDate: v.paid ? v.paidDate : null }));
+
+export type InvoicePayment = z.output<typeof invoicePaymentSchema>;

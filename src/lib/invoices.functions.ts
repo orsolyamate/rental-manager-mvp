@@ -1,6 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createPublicDbClient } from "./public-db";
-import { INVOICE_FIELDS, newInvoiceSchema, type Invoice, type InvoiceField } from "./invoices";
+import {
+  INVOICE_FIELDS,
+  invoicePaymentSchema,
+  newInvoiceSchema,
+  type Invoice,
+  type InvoiceField,
+} from "./invoices";
 
 export const getInvoices = createServerFn({ method: "GET" }).handler(
   async (): Promise<Invoice[]> => {
@@ -31,7 +37,11 @@ export const addInvoice = createServerFn({ method: "POST" })
           fieldErrors[key as InvoiceField] = issue.message;
         }
       }
-      return { ok: false, message: "A mentés nem sikerült: ellenőrizd a megjelölt mezőket.", fieldErrors };
+      return {
+        ok: false,
+        message: "A mentés nem sikerült: ellenőrizd a megjelölt mezőket.",
+        fieldErrors,
+      };
     }
     const v = parsed.data;
     const supabase = createPublicDbClient();
@@ -58,5 +68,37 @@ export const addInvoice = createServerFn({ method: "POST" })
       console.error("addInvoice failed", error.code, error.message);
       return { ok: false, message: "A mentés nem sikerült. Kérlek, próbáld újra." };
     }
+    return { ok: true };
+  });
+
+export type UpdatePaymentResult =
+  { ok: true } | { ok: false; message: string; field?: "paidDate" | undefined };
+
+// Only paid / paid_date are sent; the database also grants UPDATE on just these two columns.
+export const updateInvoicePayment = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => input)
+  .handler(async ({ data }): Promise<UpdatePaymentResult> => {
+    const parsed = invoicePaymentSchema.safeParse(data);
+    if (!parsed.success) {
+      const issue = parsed.error.issues[0];
+      return {
+        ok: false,
+        message: issue?.message ?? "Hibás adatok.",
+        field: issue?.path[0] === "paidDate" ? "paidDate" : undefined,
+      };
+    }
+    const { id, paid, paidDate } = parsed.data;
+    const supabase = createPublicDbClient();
+    const { data: rows, error } = await supabase
+      .from("invoices")
+      .update({ paid, paid_date: paidDate })
+      .eq("id", id)
+      .select("id");
+
+    if (error) {
+      console.error("updateInvoicePayment failed", error.code, error.message);
+      return { ok: false, message: "A mentés nem sikerült. Kérlek, próbáld újra." };
+    }
+    if (!rows || rows.length === 0) return { ok: false, message: "A számla nem található." };
     return { ok: true };
   });

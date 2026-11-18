@@ -1,4 +1,9 @@
+import { useState } from "react";
+import { Pencil } from "lucide-react";
+
+import { InvoicePaymentDialog } from "@/components/invoice-payment-dialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate, formatHuf } from "@/lib/common";
 import type { Invoice } from "@/lib/invoices";
@@ -13,7 +18,13 @@ function Provider({ name }: { name: string | null }) {
 
 const dash = <span className="text-muted-foreground">–</span>;
 
+function editLabel(inv: Invoice) {
+  return `Fizetési státusz módosítása: ${inv.provider_name ?? "megnevezés nélküli számla"}, ${formatDate(inv.invoice_date)}`;
+}
+
 export function InvoiceList({ invoices }: { invoices: Invoice[] }) {
+  const [editing, setEditing] = useState<Invoice | null>(null);
+
   return (
     <Card>
       <CardHeader className="pb-4">
@@ -33,7 +44,10 @@ export function InvoiceList({ invoices }: { invoices: Invoice[] }) {
                   <th className="py-2 pr-3 text-right font-medium">Összeg</th>
                   <th className="py-2 pr-3 font-medium">Fizetési határidő</th>
                   <th className="py-2 pr-3 font-medium">Státusz</th>
-                  <th className="py-2 font-medium">Fizetés dátuma</th>
+                  <th className="py-2 pr-3 font-medium">Fizetés dátuma</th>
+                  <th className="py-2 font-medium">
+                    <span className="sr-only">Műveletek</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -52,8 +66,20 @@ export function InvoiceList({ invoices }: { invoices: Invoice[] }) {
                     <td className="py-3 pr-3">
                       <StatusBadge paid={inv.paid} />
                     </td>
-                    <td className="py-3 tabular-nums">
+                    <td className="py-3 pr-3 tabular-nums">
                       {inv.paid_date ? formatDate(inv.paid_date) : dash}
+                    </td>
+                    <td className="py-2 text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditing(inv)}
+                        aria-label={editLabel(inv)}
+                        title="Fizetési státusz módosítása"
+                      >
+                        <Pencil className="h-4 w-4" aria-hidden="true" />
+                        <span className="hidden lg:inline">Módosítás</span>
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -68,7 +94,9 @@ export function InvoiceList({ invoices }: { invoices: Invoice[] }) {
                     <p className="min-w-0 break-words font-medium">
                       <Provider name={inv.provider_name} />
                     </p>
-                    <span className="shrink-0 font-semibold tabular-nums">{formatHuf(inv.amount)}</span>
+                    <span className="shrink-0 font-semibold tabular-nums">
+                      {formatHuf(inv.amount)}
+                    </span>
                   </div>
                   <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                     <div>
@@ -77,7 +105,9 @@ export function InvoiceList({ invoices }: { invoices: Invoice[] }) {
                     </div>
                     <div>
                       <dt className="text-muted-foreground">Határidő</dt>
-                      <dd className="tabular-nums">{inv.due_date ? formatDate(inv.due_date) : dash}</dd>
+                      <dd className="tabular-nums">
+                        {inv.due_date ? formatDate(inv.due_date) : dash}
+                      </dd>
                     </div>
                     <div>
                       <dt className="text-muted-foreground">Státusz</dt>
@@ -87,15 +117,27 @@ export function InvoiceList({ invoices }: { invoices: Invoice[] }) {
                     </div>
                     <div>
                       <dt className="text-muted-foreground">Fizetés dátuma</dt>
-                      <dd className="tabular-nums">{inv.paid_date ? formatDate(inv.paid_date) : dash}</dd>
+                      <dd className="tabular-nums">
+                        {inv.paid_date ? formatDate(inv.paid_date) : dash}
+                      </dd>
                     </div>
                   </dl>
+                  <Button
+                    variant="outline"
+                    className="mt-3 w-full"
+                    onClick={() => setEditing(inv)}
+                    aria-label={editLabel(inv)}
+                  >
+                    <Pencil className="h-4 w-4" aria-hidden="true" />
+                    Fizetési státusz módosítása
+                  </Button>
                 </li>
               ))}
             </ul>
           </>
         )}
       </CardContent>
+      <InvoicePaymentDialog invoice={editing} onOpenChange={(open) => !open && setEditing(null)} />
     </Card>
   );
 }
