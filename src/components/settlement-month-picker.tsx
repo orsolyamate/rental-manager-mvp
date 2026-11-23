@@ -27,6 +27,7 @@ export function SettlementMonthPicker({
         <Button
           variant="outline"
           size="icon"
+          className="h-10 w-10 shrink-0"
           aria-label="Előző hónap"
           onClick={() => onChange(shiftMonth(value, -1))}
         >
@@ -35,7 +36,7 @@ export function SettlementMonthPicker({
         <Select value={value} onValueChange={onChange}>
           <SelectTrigger
             id="settlement-month"
-            className="w-full min-w-0 sm:w-52"
+            className="h-10 w-full min-w-0 sm:w-52"
             aria-label="Hónap kiválasztása"
           >
             <SelectValue />
@@ -51,6 +52,7 @@ export function SettlementMonthPicker({
         <Button
           variant="outline"
           size="icon"
+          className="h-10 w-10 shrink-0"
           aria-label="Következő hónap"
           onClick={() => onChange(shiftMonth(value, 1))}
         >
